@@ -9,40 +9,43 @@ import (
 	"strings"
 )
 
-func GetChar() (rune, error) {
+func Rune() rune {
 	// set terminal to raw mode so we can read one character at a time
 	oldState, err := terminal.MakeRaw(int(os.Stdin.Fd()))
 	if err != nil {
-		return ' ', err
+		return ' '
 	}
 	defer terminal.Restore(int(os.Stdin.Fd()), oldState)
 
 	reader := bufio.NewReader(os.Stdin)
 
 	r, _, err := reader.ReadRune()
+	if err != nil {
+		return ' '
+	}
 
-	return r, err
+	return r
 }
 
-func StringInput() (string, error) {
+func String() string {
 	reader := bufio.NewReader(os.Stdin)
 	s, err := reader.ReadString('\n')
 	if err != nil {
-		return "", err
+		return ""
 	}
-	return strings.TrimSpace(s), nil
+	return strings.TrimSpace(s)
 }
 
-func MultilineInput(prompt string) (string, error) {
+func Multiline(prompt string) string {
 	fmt.Println(prompt)
 
 	s := ""
 	reader := bufio.NewReader(os.Stdin)
 	for {
 		if i, err := reader.ReadString('\n'); err != nil {
-			return s, err
+			return s
 		} else if strings.TrimSpace(i) == "" {
-			return s, nil
+			return s
 		} else {
 			s += i
 		}
@@ -101,7 +104,7 @@ func Select(options []string) int {
 	index := 0 // index of currently selected option
 	done := false
 	for !done {
-		c, _ := GetChar()
+		c := Rune()
 		switch c {
 		case 3: // CTRL-C
 			done = true
